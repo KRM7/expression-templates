@@ -26,7 +26,7 @@ namespace matexpr
     constexpr size_t nrows(const LeftExpr& lhs, const RightExpr& rhs) noexcept;
 
     template<typename Expr>
-    constexpr decltype(auto) get_element(const Expr& expr, size_t row, size_t col) noexcept;
+    constexpr decltype(auto) get_element(Expr&& expr, size_t row, size_t col) noexcept;
 
     template<typename MatrixExpr, typename T = std::remove_cvref_t<decltype(std::declval<MatrixExpr>()(0, 0))>>
     inline Matrix<T> to_matrix(const MatrixExpr& expr);
@@ -56,6 +56,7 @@ namespace matexpr
 
         constexpr decltype(auto) operator()(size_t row, size_t col) const noexcept
         {
+            static_assert(!std::is_same_v<std::identity, UnaryOp>);
             return std::invoke(op_, get_element(unwrap(matrix_), row, col));
         }
 
@@ -143,14 +144,14 @@ namespace matexpr
     }
 
     template<typename Expr>
-    constexpr decltype(auto) get_element(const Expr& expr, size_t row, size_t col) noexcept
+    constexpr decltype(auto) get_element(Expr&& expr, size_t row, size_t col) noexcept
     {
         /* The expression should already be unwrapped. */
-        static_assert(!is_specialization_of_v<Expr, std::reference_wrapper>);
+        static_assert(!is_specialization_of_v<std::remove_cvref_t<Expr>, std::reference_wrapper>);
 
-        if constexpr (std::is_arithmetic_v<Expr>)
+        if constexpr (std::is_arithmetic_v<std::remove_cvref_t<Expr>>)
         {
-            return expr;
+            return Expr(expr);
         }
         else /* matrix expr */
         {
