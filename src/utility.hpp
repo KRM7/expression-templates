@@ -38,16 +38,15 @@ namespace matexpr
     }
 
     template<typename T>
-    constexpr auto& unwrap(const T& value) noexcept
+    constexpr T& unwrap(T& value) noexcept
     {
-        if constexpr (is_specialization_of_v<T, std::reference_wrapper>)
-        {
-            return value.get();
-        }
-        else
-        {
-            return value;
-        }
+        return value;
+    }
+
+    template<typename T>
+    constexpr T& unwrap(const std::reference_wrapper<T>& value) noexcept
+    {
+        return value.get();
     }
 
 } // namespace matexpr
