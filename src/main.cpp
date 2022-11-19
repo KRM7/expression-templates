@@ -3,7 +3,20 @@
 
 #include <iostream>
 
-using namespace matexpr;
+using matexpr::Matrix;
+
+template<typename T>
+void printMatrix(const Matrix<T>& matrix)
+{
+    for (size_t row = 0; row < matrix.nrows(); row++)
+    {
+        for (size_t col = 0; col < matrix.ncols(); col++)
+        {
+            std::cout << matrix(row, col) << "\t";
+        }
+        std::cout << "\n";
+    }
+}
 
 int main()
 {
@@ -14,5 +27,5 @@ int main()
 
     Matrix<double> mr = r;
 
-    std::cout << mr(0, 1) << "\n"; // -6.5
+    printMatrix(mr);
 }
